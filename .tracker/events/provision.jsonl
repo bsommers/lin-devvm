@@ -4,3 +4,24 @@
 {"t":"2026-11-24T04:31:45.937Z","agent":"provision","state":"created","msg":"lin-ubuntu-ai"}
 {"t":"2026-11-24T04:33:04.857Z","agent":"provision","state":"start","msg":"lin-ubuntu-ai (ubuntu/ai)"}
 {"t":"2026-11-24T04:33:06.273Z","agent":"provision","state":"created","msg":"lin-ubuntu-ai"}
+{"t":"2026-11-24T13:02:07.795Z","agent":"provision","state":"start","msg":"lin-opensuse-ai (opensuse/ai)"}
+{"t":"2026-11-24T13:02:07.796Z","agent":"provision","state":"start","msg":"lin-rocky-ai (rocky/ai)"}
+{"t":"2026-11-24T13:02:07.798Z","agent":"provision","state":"start","msg":"lin-debian-ai (debian/ai)"}
+{"t":"2026-11-24T13:02:07.801Z","agent":"provision","state":"start","msg":"lin-arch-ai (arch/ai)"}
+{"t":"2026-11-24T13:02:07.801Z","agent":"provision","state":"start","msg":"lin-fedora-ai (fedora/ai)"}
+{"t":"2026-11-24T13:02:15.213Z","agent":"provision","state":"created","msg":"lin-fedora-ai"}
+{"t":"2026-11-24T13:02:23.944Z","agent":"provision","state":"created","msg":"lin-debian-ai"}
+{"t":"2026-11-24T13:02:32.661Z","agent":"provision","state":"created","msg":"lin-opensuse-ai"}
+{"t":"2026-11-24T13:04:16.227Z","agent":"provision","state":"created","msg":"lin-arch-ai"}
+{"t":"2026-11-24T13:35:37.550Z","agent":"provision","state":"start","msg":"lin-rocky-ai (rocky/ai)"}
+{"t":"2026-11-24T13:35:37.776Z","agent":"provision","state":"start","msg":"lin-arch-ai (arch/ai)"}
+{"t":"2026-11-24T13:35:37.782Z","agent":"provision","state":"start","msg":"lin-fedora-ai (fedora/ai)"}
+{"t":"2026-11-24T13:35:39.168Z","agent":"provision","state":"created","msg":"lin-rocky-ai"}
+{"t":"2026-11-24T13:35:39.374Z","agent":"provision","state":"created","msg":"lin-arch-ai"}
+{"t":"2026-11-24T13:35:39.636Z","agent":"provision","state":"created","msg":"lin-fedora-ai"}
+{"t":"2026-11-24T13:37:38.851Z","agent":"provision","state":"start","msg":"lin-omarchy-ai (omarchy/ai)"}
+{"t":"2026-11-24T13:37:38.853Z","agent":"provision","state":"start","msg":"lin-kubuntu-ai (kubuntu/ai)"}
+{"t":"2026-11-24T13:37:39.890Z","agent":"provision","state":"start","msg":"lin-rocky-ai (rocky/ai)"}
+{"t":"2026-11-24T13:37:40.162Z","agent":"provision","state":"created","msg":"lin-omarchy-ai"}
+{"t":"2026-11-24T13:37:40.283Z","agent":"provision","state":"created","msg":"lin-rocky-ai"}
+{"t":"2026-11-24T13:37:40.923Z","agent":"provision","state":"created","msg":"lin-kubuntu-ai"}

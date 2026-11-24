@@ -5,7 +5,9 @@ A="$DEVVM_ADMIN_USER"; G="$DEVVM_AGENT_USER"
 devvm_step "ai: base tools"
 case "$DEVVM_GUEST_FAMILY" in
   debian) pkg_install git curl wget tmux htop ripgrep jq build-essential python3 python3-pip python3-venv unzip xz-utils ca-certificates sudo ;;
-  rhel)   pkg_install git curl wget tmux htop ripgrep jq gcc gcc-c++ make python3 python3-pip unzip xz ca-certificates sudo ;;
+  rhel)   pkg_install git curl wget tmux jq gcc gcc-c++ make python3 python3-pip unzip xz ca-certificates sudo
+    # htop/ripgrep live in EPEL on RHEL clones (not Fedora): best effort
+    { pkg_try epel-release; pkg_try htop ripgrep; } ;;
   arch)   pkg_install git curl wget tmux htop ripgrep jq base-devel python python-pip unzip xz ca-certificates sudo ;;
   suse)   pkg_install git curl wget tmux htop ripgrep jq gcc gcc-c++ make python3 python3-pip unzip xz ca-certificates sudo ;;
 esac

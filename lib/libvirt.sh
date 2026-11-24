@@ -37,7 +37,7 @@ hv_create() {
   hv_run "${vi[@]}" --connect "$LIBVIRT_URI" \
     --name "$VM_NAME" --osinfo "$OS_VARIANT" \
     --memory "$VM_RAM_MB" --vcpus "$VM_VCPUS" --cpu host-passthrough \
-    --boot "${UEFI_BOOT:-uefi}" --import \
+    --machine "${MACHINE:-q35}" --boot "${UEFI_BOOT:-uefi}" --import \
     "${disks[@]}" \
     --network none \
     --qemu-commandline="-netdev user,id=n0,$fwd -device virtio-net-pci,netdev=n0,mac=$VM_MAC,bus=pcie.0,addr=0x1e" \

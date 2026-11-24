@@ -9,7 +9,7 @@ Unattended **Linux dev VMs** on a Linux host: rootless KVM via libvirt, vendor c
 | `debian` | Debian 13 | genericcloud |
 | `fedora` | Fedora 45 | |
 | `arch` | Arch Linux | rolling image |
-| `omarchy` | Arch + Omarchy installer | best effort, Hyprland; see `guests/omarchy/setup.sh` |
+| `omarchy` | Arch base; Omarchy installer **blocked** (needs limine+btrfs, see `guests/omarchy/setup.sh`) | boots, SSH, tools, web IDE work; no Hyprland desktop |
 | `opensuse` | Tumbleweed | |
 | `rocky` | Rocky 10 | |
 
@@ -33,6 +33,9 @@ Use the same `GUEST/ROLE/VM_NAME` env for `vm.sh` as for `provision.sh` (VM name
 
 ## Layout
 `config.env` defaults · `provision.sh`/`vm.sh` · `lib/` (libvirt, cloud-init seed, image cache with sha256/sha512 verification) · `guest/common.sh` (in-guest helpers, state file `/var/lib/devvm-state`) · `guests/<name>/guest.env` (+`setup.sh`) · `roles/{dev,ai,web}.sh` · `tools/` + `.tracker/` (local progress page) · `tests/`.
+
+## Validation status (live boots, `ROLE=ai WEB=1`)
+ubuntu, kubuntu (KDE installed), debian, fedora (SELinux enforcing), arch, rocky, opensuse: reach DONE with SSH, agent/dev isolation, /work disk and loopback-only web IDE. omarchy: provisions as Arch but its own installer refuses cloud images. `ROLE=dev`, checkpoint/rollback and multi-VM coexistence are still untested.
 
 ## Documentation
 | Doc | Contents |

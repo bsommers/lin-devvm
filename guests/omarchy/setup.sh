@@ -24,7 +24,7 @@ if [ "${DEVVM_DESKTOP:-0}" = 1 ]; then
          bash -c 'cd "$OMARCHY_PATH" && source install.sh' </dev/null; then
       touch /var/lib/devvm-omarchy-done
     else
-      devvm_step "WARNING: Omarchy install.sh failed or was interrupted; see /var/log/devvm-provision.log"
+      devvm_step "WARNING: Omarchy install.sh failed (its preflight guard needs limine + btrfs root, which cloud images lack; boot the Omarchy ISO for the real desktop); see /var/log/devvm-provision.log"
     fi
   fi
 fi

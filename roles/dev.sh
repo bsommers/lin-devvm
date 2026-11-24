@@ -3,8 +3,10 @@
 devvm_step "dev: base tools"
 case "$DEVVM_GUEST_FAMILY" in
   debian) pkg_install git curl wget tmux htop ripgrep fd-find jq build-essential python3 python3-pip python3-venv unzip ca-certificates nodejs npm ;;
-  rhel)   pkg_install git curl wget tmux htop ripgrep jq gcc gcc-c++ make python3 python3-pip unzip ca-certificates nodejs npm
-          pkg_try fd-find ;;
+  rhel)   pkg_install git curl wget tmux jq gcc gcc-c++ make python3 python3-pip unzip ca-certificates nodejs npm
+          pkg_try fd-find
+    # htop/ripgrep live in EPEL on RHEL clones (not Fedora): best effort
+    { pkg_try epel-release; pkg_try htop ripgrep; } ;;
   arch)   pkg_install git curl wget tmux htop ripgrep fd jq base-devel python python-pip unzip ca-certificates nodejs npm ;;
   suse)   pkg_install git curl wget tmux htop ripgrep jq gcc gcc-c++ make python3 python3-pip unzip ca-certificates nodejs npm
           pkg_try fd ;;

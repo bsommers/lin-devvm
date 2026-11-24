@@ -56,6 +56,12 @@ CFG
     [[ -n "$out" ]] || { devvm_warn "code-server not listening on $p"; return 0; }
     if echo "$out" | grep -vqE '^(127\.0\.0\.1|\[::1\]):'; then devvm_fail "code-server port $p not loopback-only: $out"; fi
   }
+  # SELinux (fedora/rocky): a lib_t node binary runs as init_t, which may not execmem -> V8 traps. bin_t makes it transition to a service domain.
+  if have getenforce && [[ "$(getenforce 2>/dev/null)" == Enforcing ]]; then
+    for n in /usr/local/lib/code-server-*/lib/node /usr/lib/code-server/lib/node; do
+      [[ -f "$n" ]] && { chcon -t bin_t "$n" || devvm_warn "chcon bin_t $n failed"; }
+    done
+  fi
   devvm_step "web: configure code-server"
   systemctl daemon-reload
   cs_config "$DEVVM_ADMIN_USER" "$DEVVM_WEB_PORT_GUEST"
