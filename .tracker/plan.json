@@ -1,0 +1,156 @@
+{
+  "title": "lin-devvm",
+  "phases": [
+    {
+      "id": "core",
+      "name": "Core",
+      "status": "done",
+      "tasks": [
+        {
+          "name": "config / provision / vm",
+          "status": "done",
+          "owner": "orchestrator"
+        },
+        {
+          "name": "libvirt + cloud-init libs",
+          "status": "done",
+          "owner": "orchestrator"
+        }
+      ]
+    },
+    {
+      "id": "guests",
+      "name": "Guests",
+      "status": "done",
+      "tasks": [
+        {
+          "name": "ubuntu",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "kubuntu",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "debian",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "fedora",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "arch",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "omarchy",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "opensuse",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "rocky",
+          "status": "done",
+          "owner": ""
+        }
+      ]
+    },
+    {
+      "id": "roles",
+      "name": "Roles",
+      "status": "done",
+      "tasks": [
+        {
+          "name": "dev",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "ai",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "web IDE over SSH tunnel",
+          "status": "done",
+          "owner": ""
+        }
+      ]
+    },
+    {
+      "id": "tracker",
+      "name": "Tracker",
+      "status": "done",
+      "tasks": [
+        {
+          "name": "server + page + track.sh",
+          "status": "done",
+          "owner": "tracker"
+        }
+      ]
+    },
+    {
+      "id": "tests",
+      "name": "Tests+CI",
+      "status": "done",
+      "tasks": [
+        {
+          "name": "tests/run.sh",
+          "status": "done",
+          "owner": ""
+        },
+        {
+          "name": "CI workflow",
+          "status": "done",
+          "owner": ""
+        }
+      ]
+    },
+    {
+      "id": "docs",
+      "name": "Docs",
+      "status": "done",
+      "tasks": [
+        {
+          "name": "README / guides",
+          "status": "done",
+          "owner": ""
+        }
+      ]
+    },
+    {
+      "id": "live",
+      "name": "Live VM validation",
+      "status": "done",
+      "tasks": [
+        {
+          "name": "boot at least one guest and reach DONE",
+          "status": "done",
+          "owner": ""
+        }
+      ]
+    },
+    {
+      "id": "publish",
+      "name": "Publish",
+      "status": "doing",
+      "tasks": [
+        {
+          "name": "public GitHub repo",
+          "status": "doing",
+          "owner": ""
+        }
+      ]
+    }
+  ]
+}

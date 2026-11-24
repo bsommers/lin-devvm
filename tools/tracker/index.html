@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>lin-devvm tracker</title>
+<style>
+:root{--bg:#0d1117;--p:#151b26;--l:#263046;--ink:#e6e9ef;--i2:#9aa4b8;--i3:#667089;--ac:#4cc9f0;
+--todo:#5b6788;--doing:#ffc93c;--done:#5fd39a;--blocked:#ff9f43;--failed:#ff5470}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.4 system-ui,sans-serif}
+.w{max-width:1500px;margin:0 auto;padding:16px}h1{margin:0 0 12px;font-size:20px}h1 small{color:var(--i3);font-size:12px;margin-left:8px}
+h2{margin:0 0 10px;font:700 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ac)}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}.p{background:var(--p);border:1px solid var(--l);border-radius:10px;padding:14px;min-width:0}
+.wide{grid-column:1/-1}.m{font-family:ui-monospace,monospace}.d{color:var(--i3)}
+.pill{display:inline-block;padding:1px 8px;border-radius:9px;font:11px ui-monospace,monospace;border:1px solid currentColor}
+.todo{color:var(--todo)}.doing,.start,.progress{color:var(--doing)}.done,.running{color:var(--done)}.blocked,.note{color:var(--blocked)}.failed{color:var(--failed)}
+.bar{height:6px;background:#0a0e15;border-radius:3px;overflow:hidden;margin-top:4px}.bar i{display:block;height:100%;background:var(--ac)}
+.ph{border-top:1px solid var(--l);padding:8px 0}.ph:first-of-type{border:0}.ph .t{display:flex;gap:8px;align-items:center;font-weight:600}
+.tk{display:flex;gap:8px;padding:2px 0 2px 14px;color:var(--i2)}.tk .o{margin-left:auto;color:var(--i3)}
+.ag{padding:8px 0;border-top:1px solid var(--l)}.ag:first-of-type{border:0}.ev{max-height:110px;overflow:auto;margin-top:6px;font:11px ui-monospace,monospace;color:var(--i2)}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:4px 6px;border-top:1px solid var(--l)}th{color:var(--i3);font-weight:500;border:0}
+</style></head><body><div class="w">
+<h1>lin-devvm tracker<small id="live">connecting</small><small id="root"></small></h1>
+<div class="g">
+<div class="p wide"><h2>Plan <span id="pp" class="d"></span></h2><div id="plan"></div></div>
+<div class="p"><h2>Agents</h2><div id="ag"></div></div>
+<div class="p"><h2>VMs</h2><div id="vm"></div></div>
+<div class="p"><h2>Repo &amp; tests</h2><div id="repo"></div></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pill=s=>`<span class="pill ${E(s)}">${E(s||'?')}</span>`;
+function render(s){
+  $('root').textContent=s.root;
+  const ph=(s.plan&&s.plan.phases)||[];const dn=ph.filter(p=>p.status==='done').length;
+  $('pp').textContent=ph.length?`${dn}/${ph.length} done`:'';
+  $('plan').innerHTML=ph.map(p=>`<div class="ph"><div class="t">${pill(p.status)} ${E(p.name||p.id)}</div>`+
+    (p.tasks||[]).map(t=>`<div class="tk">${pill(t.status)} ${E(t.name)}<span class="o">${E(t.owner||'')}</span></div>`).join('')+'</div>').join('')||'<span class="d">no plan.json</span>';
+  const ag=Object.values(s.agents||{}).sort((a,b)=>(b.t||'').localeCompare(a.t||''));
+  $('ag').innerHTML=ag.map(a=>`<div class="ag"><b class="m">${E(a.id)}</b> ${pill(a.state)} <span class="d">${E((a.t||'').slice(11,19))}</span><div>${E(a.msg)}</div>`+
+    (a.pct!=null?`<div class="bar"><i style="width:${Math.max(0,Math.min(100,a.pct))}%"></i></div>`:'')+
+    `<div class="ev">${a.events.slice().reverse().map(e=>`${E((e.t||'').slice(11,19))} ${E(e.state)} ${E(e.msg)}`).join('<br>')}</div></div>`).join('')||'<span class="d">no events</span>';
+  const vmap={};(s.vms||[]).forEach(v=>vmap[v.name]=v.state);
+  $('vm').innerHTML='<table><tr><th>guest</th><th>family</th><th>desktop</th><th>image</th></tr>'+
+    (s.guests||[]).map(g=>`<tr><td>${E(g.label)}</td><td>${E(g.family)}</td><td>${g.desktop?'yes':'no'}</td><td class="${g.verified?'done':'todo'}">${g.verified?'verified':'unverified'}</td></tr>`).join('')+'</table>'+
+    '<h2 style="margin-top:12px">libvirt (lin-*)</h2>'+(s.vms==null?'<span class="d">virsh unavailable</span>':s.vms.length?s.vms.map(v=>`<div class="m">${E(v.name)} ${pill(v.state==='running'?'running':'todo').replace('>todo<','>'+E(v.state)+'<')}</div>`).join(''):'<span class="d">none</span>');
+  const g=s.git,t=s.tests;
+  $('repo').innerHTML=(g?`<div class="m">${E(g.branch)} &middot; ${g.changed} changed (${g.untracked} untracked)</div><div class="ev">${g.log.map(E).join('<br>')}</div>`:'<span class="d">not a git repo</span>')+
+    '<h2 style="margin-top:12px">Tests</h2>'+(t?`<div>${pill(t.failed?'failed':'done')} ${t.passed||0} passed, ${t.failed||0} failed <span class="d">${E((t.t||'').slice(0,19))}</span></div>`+(t.suites||[]).map(x=>`<div class="tk">${pill(x.status)} ${E(x.name)}</div>`).join(''):'<span class="d">no tests.json</span>');
+}
+let poll;const live=(c,t)=>{$('live').textContent=t;$('live').style.color=c};
+async function once(){try{render(await (await fetch('/api/state',{cache:'no-store'})).json());live('#ffc93c','polling')}catch{live('#ff5470','offline')}}
+function sse(){if(!window.EventSource)return poll=setInterval(once,2000),once();
+  const es=new EventSource('/api/stream');es.onmessage=m=>{try{render(JSON.parse(m.data));live('#5fd39a','live')}catch{}};
+  es.onerror=()=>{live('#ffc93c','polling');if(!poll){poll=setInterval(once,2000);once()}};es.onopen=()=>{if(poll){clearInterval(poll);poll=0}}}
+sse();
+</script></body></html>
