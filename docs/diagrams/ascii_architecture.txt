@@ -1,0 +1,100 @@
+lin-devvm ASCII diagrams
+========================
+1. Provision flow    2. VM lifecycle (incl. reset)    3. Network / tunnel    4. User isolation (ROLE=ai)
+
+1. PROVISION FLOW  (provision.sh [--force|--reset])
+---------------------------------------------------
+ GUEST/ROLE/WEB env --> config.env --> guests/$GUEST/guest.env  (exit 1 if GUEST/ROLE unknown)
+        |
+        v
+ hv_check (virt-install virsh xorriso qemu-img curl ssh-keygen, /dev/kvm rw)
+        |
+        v
+ VM exists? --yes--> --force: destroy+undefine, rm -rf VM_DIR
+        |            --reset: destroy+undefine, rm disk.qcow2 seed.iso known_hosts (keeps data.qcow2)
+        |            none   : error, exit 1
+        v
+ mkdir VM_DIR (0700); ssh-keygen ed25519 if $SSH_KEY missing
+        |
+        v
+ compose $STAGE/provision-guest.sh  (bash -n checked)
+   [ env header: export DEVVM_<GUEST GUEST_FAMILY ROLE WEB ADMIN_USER AGENT_USER WEB_PASS
+                  WEB_PORT_GUEST DESKTOP DESKTOP_ENV DATA_DISK_GB VM_NAME> ]
+ + guest/common.sh          (helpers, state file, ssh hardening, qemu-ga)
+ + guests/$GUEST/setup.sh   (only if present: kubuntu, omarchy)
+ + roles/$ROLE.sh           (dev | ai)
+ + roles/web.sh             (only if WEB=1)
+ + devvm_finish
+        |
+        v
+ lib/cloudinit.sh: user-data (users + b64 script + runcmd) + meta-data
+        |
+        v
+ hv_create: image_fetch (cache + checksum) -> qcow2 overlay disk.qcow2
+            xorriso seed.iso (label cidata) -> [data.qcow2 if DATA_DISK_GB>0]
+            virt-install --import  (user-mode NIC, hostfwd 127.0.0.1:SSH_PORT->22)
+        |
+        v
+ host returns;  guest first boot: cloud-init creates users, runs
+ /usr/local/sbin/devvm-provision.sh >> /var/log/devvm-provision.log
+        |
+        v
+ /var/lib/devvm-state:  installing: <step> ... -> DONE | FAILED: <step>
+ (host: ./vm.sh wait polls it over SSH)
+
+2. VM LIFECYCLE
+---------------
+                    provision.sh
+   (absent) ------------------------------> INSTALLING --(devvm_finish)--> READY (DONE)
+      ^                                         |                              |  ^
+      | vm.sh destroy                           | devvm_fail                   |  | vm.sh start
+      | (rm -rf VM_DIR, incl. /work)            v                              v  |
+      +------------------------------------- FAILED  <-- still running     STOPPED (stop=ACPI, kill=destroy)
+                                                                               |
+   READY/STOPPED --- vm.sh reset (= provision.sh --reset) --->  INSTALLING     |
+        system disk rebuilt from cached cloud image + fresh cloud-init;        |
+        data.qcow2 (/work) is kept and re-mounted (no mkfs: blkid finds ext4)  |
+   READY/STOPPED --- provision.sh --force --> destroy + rm -rf VM_DIR -> INSTALLING (data lost)
+   vm.sh checkpoint [name]: force-off + qemu-img snapshot -c on disk.qcow2  --> STOPPED
+   vm.sh rollback   [name]: force-off + qemu-img snapshot -a on disk.qcow2  --> STOPPED
+   (snapshots cover the system disk only, never /work)
+
+3. NETWORK / TUNNEL
+-------------------
+ HOST (loopback only)                                      GUEST (QEMU user-mode NIC, no inbound)
+ +-----------------------------+  hostfwd                 +-------------------------------------+
+ | ssh/scp  ---> 127.0.0.1:    |  tcp 127.0.0.1:SSH_PORT  | sshd :22  (key only, no root,       |
+ |   SSH_PORT (2300+slot) -----+------------------------->|           AllowTcpForwarding yes)   |
+ |                             |  -> guest :22            |                                     |
+ | vm.sh web = ssh -N -L       |   (ssh session)          | code-server  admin  127.0.0.1:8080  |
+ |  127.0.0.1:WEB_PORT --------+------------------------->|   (WEB_PORT_GUEST)                  |
+ |   (18080+slot)              |   -L ... 127.0.0.1:8080  |                                     |
+ |  127.0.0.1:WEB_PORT+1000 ---+------------------------->| code-server  agent  127.0.0.1:8081  |
+ |   (ROLE=ai only)            |   -L ... 127.0.0.1:8081  |   (WEB_PORT_GUEST+1)                |
+ | VNC 127.0.0.1 (virt-viewer) |                          +-------------------------------------+
+ +-----------------------------+                          guest -> outside: unrestricted NAT
+ slot = cksum(VM_NAME) % 899   e.g. lin-ubuntu-ai: slot 132 -> ssh 2432, web 18212, agent web 19212
+ The browser/tracker talk only to 127.0.0.1; nothing listens on a LAN address.
+
+4. USER ISOLATION (ROLE=ai)
+---------------------------
+ host key ($SSH_KEY.pub) is authorised for BOTH users
+   ./vm.sh ssh            ./vm.sh ssh --agent
+        |                        |
+        v                        v
+ +----------------------+  +----------------------+
+ | dev  (ADMIN_USER)    |  | agent (AGENT_USER)   |
+ | sudo NOPASSWD:ALL    |  | no sudo, no password |
+ | /home/dev     0750   |  | /home/agent   0750   |
+ | ~/work -> /work/     |  | ~/work -> /work/     |
+ |           interactive|  |           agent      |
+ | code-server :8080    |  | code-server :8081    |
+ +-----------+----------+  | node, claude-code,   |
+             |             | uv, gh, tmux; linger |
+             | sudo -u agent  +-----------+----------+
+             +--- devvm-agent-run --------+  (tmux + systemd-run --user scope:
+                                              MemoryMax=8G CPUQuota=400% defaults)
+ /work (data.qcow2, ext4 LABEL=work, 0755)
+   /work/interactive  dev:dev   0750
+   /work/agent        agent:agent 0750
+ Same kernel, same machine: separation is Unix permissions, not a sandbox.

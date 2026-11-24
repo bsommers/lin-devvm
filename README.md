@@ -34,6 +34,16 @@ Use the same `GUEST/ROLE/VM_NAME` env for `vm.sh` as for `provision.sh` (VM name
 ## Layout
 `config.env` defaults · `provision.sh`/`vm.sh` · `lib/` (libvirt, cloud-init seed, image cache with sha256/sha512 verification) · `guest/common.sh` (in-guest helpers, state file `/var/lib/devvm-state`) · `guests/<name>/guest.env` (+`setup.sh`) · `roles/{dev,ai,web}.sh` · `tools/` + `.tracker/` (local progress page) · `tests/`.
 
+## Documentation
+| Doc | Contents |
+|---|---|
+| [docs/README.md](docs/README.md) | index + reading order |
+| [docs/purpose.md](docs/purpose.md) | problem, tenets, threat model |
+| [docs/architecture.md](docs/architecture.md) | design, provisioning flow, diagrams |
+| [docs/running.md](docs/running.md) | prerequisites, every variable, CLI reference |
+| [docs/how-to.md](docs/how-to.md) | recipes |
+| [docs/usermanual/](docs/usermanual/README.md) | 7-chapter user manual incl. troubleshooting/FAQ |
+
 ## Tracker
 `tools/track.sh serve` -> http://127.0.0.1:4790 : plan, event feed, guest list, live `lin-*` VM state, test results.
 
