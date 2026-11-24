@@ -143,11 +143,11 @@
     {
       "id": "publish",
       "name": "Publish",
-      "status": "doing",
+      "status": "done",
       "tasks": [
         {
           "name": "public GitHub repo",
-          "status": "doing",
+          "status": "done",
           "owner": ""
         }
       ]

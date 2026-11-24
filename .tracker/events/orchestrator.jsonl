@@ -1,1 +1,2 @@
 {"t":"2026-11-24T04:34:34.896Z","agent":"orchestrator","state":"done","pct":100,"msg":"live-validated ubuntu ai+web, reset keeps /work"}
+{"t":"2026-11-24T04:34:51.423Z","agent":"orchestrator","state":"done","pct":100,"msg":"published https://github.com/bsommers/lin-devvm"}
